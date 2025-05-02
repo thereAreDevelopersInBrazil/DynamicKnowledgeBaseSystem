@@ -1,0 +1,104 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "jest": true
+    },
+    
+    "extends": ["plugin:sonarjs/recommended", "eslint:recommended", "plugin:@typescript-eslint/recommended"],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": ["@typescript-eslint", "sonarjs"],
+    "rules": {
+        "sonarjs/cognitive-complexity": "warn",
+        "sonarjs/no-identical-expressions": "error",
+        "quotes": [
+            "warn",
+            "single",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
+        "semi": "warn",
+        "arrow-parens": ["warn", "always"],
+        "comma-dangle": "off",
+        "prefer-const": "error",
+        "no-var": "error",
+        "no-unused-vars": "off",
+        "spaced-comment": "warn",
+        "camelcase": "off",
+        "no-invalid-this": "error",
+        "no-unused-expressions": "error",
+        "space-in-parens": ["warn", "never"],
+        "array-bracket-spacing": ["warn", "never"],
+        "computed-property-spacing": ["warn", "never"],
+        "object-curly-spacing": ["warn", "never"],
+        "no-console": ["warn"],
+        "require-jsdoc": "off",
+        "valid-jsdoc": "warn",
+        "guard-for-in": "warn",
+        "no-empty-function": "off",
+        "no-debugger": "error",
+        "new-cap": [
+            "error",
+            {
+                "newIsCap": true,
+                "capIsNew": true
+            }
+        ],
+        "indent": ["warn", 4],
+        "max-len": [
+            "warn",
+            {
+                "code": 120,
+                "comments": 80,
+                "tabWidth": 4,
+                "ignoreStrings": true,
+                "ignoreComments": true,
+                "ignoreTrailingComments": false,
+                "ignoreUrls": true,
+                "ignoreTemplateLiterals": true
+            }
+        ],
+        "max-depth": [
+            "error",
+            {
+                "max": 4
+            }
+        ],
+        "max-nested-callbacks": [
+            "error",
+            {
+                "max": 6
+            }
+        ],
+        "function-paren-newline": ["warn", "consistent"],
+        "function-call-argument-newline": ["warn", "consistent"], // vai cobrar que vc seja consistente, se começou chamando a função com todos argumentos na mesma linha, tem que terminar chamando todos argumentos na mesma linha, se começou chamando 1 argumento por linha, tem que terminar chamando 1 argumento por linha. Não permite começar de um jeito e terminar de outro, ambos são permitidos mais sem misturar
+        "array-element-newline": [
+            "warn",
+            {
+                "multiline": true,
+                "minItems": 3
+            }
+        ],
+        "@typescript-eslint/ban-ts-comment": [
+            "warn",
+            {
+                "ts-ignore": "allow-with-description",
+                "ts-nocheck": "allow-with-description",
+                "ts-check": "allow-with-description",
+                "ts-expect-error": "allow-with-description"
+            }
+        ],
+        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/no-empty-function": "error",
+        "require-jsdoc-except/require-jsdoc": "off"
+    }
+}
