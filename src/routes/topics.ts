@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Get, Post, Put, Patch, Delete } from '../controllers/users/index';
+import { Get, Post, Put, Patch, Delete } from '../controllers/topics/index';
 
 const router = Router();
 
