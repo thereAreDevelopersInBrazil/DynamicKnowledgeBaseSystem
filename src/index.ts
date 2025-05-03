@@ -5,7 +5,6 @@ import { HTTPSTATUS, PORT } from './constants/http';
 // @TODO: Automatize all the routing system
 import usersRoutes from './routes/users';
 import topicsRoutes from './routes/topics';
-import resourcesRoutes from './routes/resources';
 
 const server = express();
 
@@ -24,7 +23,6 @@ server.use(express.json());
 
 server.use('/users', usersRoutes);
 server.use('/topics', topicsRoutes);
-server.use('/resources', resourcesRoutes);
 
 server.listen(PORT, (err) => {
     if (err) {

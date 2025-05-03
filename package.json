@@ -4,7 +4,7 @@
   "description": "This system should manage interconnected topics and resources with version control, user roles, and permissions.",
   "main": "index.ts",
   "scripts": {
-    "dev": "tsnd --respawn --transpile-only src/index.ts"
+    "dev": "npx drizzle-kit generate && npx drizzle-kit migrate && npx drizzle-kit push && tsnd --respawn --transpile-only src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/thereAreDevelopersInBrazil/DynamicKnowledgeBaseSystem#readme",
   "devDependencies": {
     "@eslint/js": "^9.25.1",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.1",
     "eslint": "^9.25.1",
     "globals": "^16.0.0",
@@ -27,6 +28,9 @@
     "typescript-eslint": "^8.31.1"
   },
   "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "drizzle-kit": "^0.31.0",
+    "drizzle-orm": "^0.43.1",
     "express": "^5.1.0",
     "uuid": "^11.1.0",
     "zod": "^3.24.3"

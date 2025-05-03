@@ -1,10 +1,14 @@
 import { z } from 'zod';
 
-export const id = z.string().uuid();
+export const id = z.number();
+
+export const idSchema = z.object({
+  id
+});
 
 export const timed = z.object({
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });
 
 export const schema = z.object({
