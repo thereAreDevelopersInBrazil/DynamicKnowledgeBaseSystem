@@ -1,10 +1,10 @@
-import { AUsers } from "../abstracts/AUsers";
+import { AUser } from "./AUser";
 import { Users } from "../../schemas";
 import { IAdmin } from "../../interfaces/IAdmin";
 import { IEditor } from "../../interfaces/IEditor";
 import { IViewer } from "../../interfaces/IViewer";
 
-export class Admin extends AUsers implements IAdmin, IEditor, IViewer {
+export class Admin extends AUser implements IAdmin, IEditor, IViewer {
     constructor(admin: Users.Shape) {
         super(admin);
     }

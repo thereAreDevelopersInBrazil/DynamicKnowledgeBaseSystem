@@ -1,7 +1,7 @@
-import { AUsers } from "../abstracts/AUsers";
+import { AUser } from "./AUser";
 import { Users } from "../../schemas";
 
-export class Viewer extends AUsers {
+export class Viewer extends AUser {
     constructor(viewer: Users.Shape) {
         super(viewer);
     }

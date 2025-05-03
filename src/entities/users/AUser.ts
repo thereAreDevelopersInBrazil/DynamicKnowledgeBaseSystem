@@ -1,10 +1,10 @@
-import { AEntity } from "./AEntity";
+import { AEntity } from "../abstracts/AEntity";
 import { Users } from "../../schemas";
 
-export abstract class AUsers extends AEntity {
+export abstract class AUser extends AEntity {
     protected name: string;
     protected email: string;
-    protected role: Users.roles;
+    protected role: Users.Roles;
 
     constructor(user: Users.Shape) {
         super(user);
@@ -29,11 +29,11 @@ export abstract class AUsers extends AEntity {
         this.email = email;
     }
 
-    public getRole(): Users.roles {
+    public getRole(): Users.Roles {
         return this.role;
     }
 
-    public setRole(role: Users.roles): void {
+    public setRole(role: Users.Roles): void {
         this.role = role;
     }
 }

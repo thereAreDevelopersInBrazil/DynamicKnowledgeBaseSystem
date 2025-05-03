@@ -1,9 +1,9 @@
-import { AUsers } from "../abstracts/AUsers";
+import { AUser } from "./AUser";
 import { Users } from "../../schemas";
 import { IEditor } from "../../interfaces/IEditor";
 import { IViewer } from "../../interfaces/IViewer";
 
-export class Editor extends AUsers implements IEditor, IViewer {
+export class Editor extends AUser implements IEditor, IViewer {
     constructor(editor: Users.Shape) {
         super(editor);
     }
