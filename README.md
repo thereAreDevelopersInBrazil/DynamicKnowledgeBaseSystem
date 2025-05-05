@@ -5,8 +5,9 @@ This system should manage interconnected topics and resources with version contr
 I wrote this REAME with great care, but if you want to, you can skip to the end to see installation and running instructions!
 
 ## Project Setup:
-
 I got some templates and boilerplates but I decided to architech and code this project from zero for you guys 💙
+So if there is something that is little tailored, handmade, its cause I did from scratch insted of copying
+
 
 For this project I used:
 - NodeJs + Typescript
