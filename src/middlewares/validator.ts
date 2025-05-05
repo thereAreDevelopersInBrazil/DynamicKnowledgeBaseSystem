@@ -53,9 +53,9 @@ export const validator = (schema: {
     validate('params', req.params, schema.params);
 
     if (allErrors.length > 0) {
-      res.status(HTTPSTATUS.BAD_REQUEST).json({ errors: allErrors });
+      res.status(HTTPSTATUS.BAD_REQUEST).json({ error: allErrors }).end();
+    }else{
+      next();
     }
-
-    next();
   };
 };

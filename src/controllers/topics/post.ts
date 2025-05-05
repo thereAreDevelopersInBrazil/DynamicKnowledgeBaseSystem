@@ -18,6 +18,9 @@ export const Post = async (req: Request, res: Response) => {
             res.status(HTTPSTATUS.OK).json(insertedTopicWithNestedParents).end();
         }
     } catch (error) {
-        res.status(HTTPSTATUS.SERVER_ERROR).send("Error inserting topic! Details: " + error).end();
+        res.status(HTTPSTATUS.SERVER_ERROR).json({
+            error: 'Unexpected error while creating topic!',
+            details: error
+        }).end();
     }
 };

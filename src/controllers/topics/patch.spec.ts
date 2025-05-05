@@ -1,0 +1,48 @@
+import request from "supertest";
+import server from "../../server";
+import { HTTPSTATUS } from "../../constants/http";
+import { partialUpdateTopic } from "../../services/topics";
+import { VALID_RFC6902_PATCH, VALID_TOPIC } from "../../mocks";
+
+jest.mock('../../services/topics', () => ({
+    partialUpdateTopic: jest.fn()
+}));
+
+describe('Test PATCH /topics route', () => {
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should be an 400 to call the API without id param', async () => {
+        const response = await request(server).patch('/topics');
+
+        expect(response.statusCode).toEqual(HTTPSTATUS.BAD_REQUEST);
+        expect(response.body).toHaveProperty("error");
+    });
+
+    it('should be an 400 to call the API without body following RFC 6902 for body format', async () => {
+        const response = await request(server)
+                                .patch('/topics/999')
+                                .send({
+                                    something: "something",
+                                    anotherthing: "anotherthing"
+                                });
+
+        expect(response.statusCode).toEqual(HTTPSTATUS.BAD_REQUEST);
+        expect(response.body).toHaveProperty("error");
+        expect(response.body.error).toHaveLength(3);
+    });
+
+    it('should be an 200 to call the API following RFC 6902 for body format ', async () => {
+        (partialUpdateTopic as jest.Mock).mockResolvedValue(VALID_TOPIC);
+        
+        const response = await request(server)
+                                .patch('/topics/999')
+                                .send(VALID_RFC6902_PATCH);
+
+        expect(response.statusCode).toEqual(HTTPSTATUS.OK);
+        expect(response.body).toMatchObject(VALID_TOPIC);
+    });
+
+});

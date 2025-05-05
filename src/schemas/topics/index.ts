@@ -1,12 +1,33 @@
 import { z } from 'zod';
 import { schema as AEntitySchema } from '../abstracts';
 
-export const base = z.object({
-    name: z.string().min(1, { message: 'The topic name should have at least 1 character!' }),
-    content: z.string({ message: 'If provided, the topic content should be an valid string!' }).optional().nullable(),
-    parentTopicId: z.number({message: 'If provided, the id of the parent topic should be an valid number!'}).nullable()
+export const getSchema = z.object({
+    version: z.coerce
+        .number({ message: "Version should be a number!" })
+        .int({ message: "Version should be an integer number!" })
+        .gte(1, { message: "Version should be greater or equal than 1!" })
+        .optional()
 });
 
+export const getPathSchema = z.object({
+    origin_topic_id: z.coerce
+        .number({ message: "The origin topic id should be a number!" })
+        .int({ message: "The origin topic id should be an integer number!" })
+        .gte(1, { message: "The origin topic id should be greater or equal than 1!" }),
+    target_topic_id: z.coerce
+        .number({ message: "The target topic id should be a number!" })
+        .int({ message: "The target topic id should be an integer number!" })
+        .gte(1, { message: "The target topic id should be greater or equal than 1!" }),
+});
+
+export const nameSchema = z.string().min(1, { message: 'The topic name should have at least 1 character!' });
+export const contentSchema = z.string({ message: 'If provided, the topic content should be an valid string!' }).optional().nullable();
+export const base = z.object({
+    name: nameSchema,
+    content: contentSchema,
+    parentTopicId: z.number({ message: "The parent topic id is required! If you want to create new root topic send 'null' it will be accepted!" })
+        .nullable()
+});
 
 export const internal = z.object({ version: z.number({ message: 'The topic version should be an number!' }).optional().nullable() });
 

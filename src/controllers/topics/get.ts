@@ -7,11 +7,12 @@ export const Get = async (req: Request, res: Response): Promise<void> => {
     try {
 
         const idToSearch = Number(req.params.id);
+        const version = req.query.version ? Number(req.query.version) : null;
 
         // My intention here is to be less restrict with users
         // and avoid API error 400 if not specified and id to search
         // So, if its not specified I will get all topics from the root topic (earliest topic in database)
-        const topicResult = !idToSearch ? await getFirstTopic() : await getById(idToSearch);
+        const topicResult = !idToSearch ? await getFirstTopic() : await getById(idToSearch, version);
 
         if (!topicResult) {
             // I think that if there is no first topic at all, the database is empty
@@ -29,15 +30,16 @@ export const Get = async (req: Request, res: Response): Promise<void> => {
         }
 
         const topicsWithChildren = await buildChildren(topicResult);
+
         if (topicsWithChildren) {
             res.status(HTTPSTATUS.OK).json(topicsWithChildren).end();
         } else {
             res.status(HTTPSTATUS.NOT_FOUND).send('Topic id: ' + idToSearch + ' not found!').end();
         }
-        return;
     } catch (error) {
-        res.status(HTTPSTATUS.SERVER_ERROR).send("Error retrieving topic with children! Details: " + error).end();
+        res.status(HTTPSTATUS.SERVER_ERROR).json({
+            error: "Error retrieving topic with children! Details: " + error
+        }).end();
     }
-    return;
 };
 

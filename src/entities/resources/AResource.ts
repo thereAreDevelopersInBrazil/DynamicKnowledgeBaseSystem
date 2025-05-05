@@ -2,7 +2,7 @@ import { AEntity } from "../abstracts/AEntity";
 import { Resources } from "../../schemas";
 
 export abstract class AResource extends AEntity {
-    protected topicId: string;
+    protected topicId: number;
     protected url: string;
     protected description: string;
     protected type: Resources.Types;
@@ -15,11 +15,11 @@ export abstract class AResource extends AEntity {
         this.type = resource.type;
     }
 
-    public getTopicId(): string {
+    public getTopicId(): number {
         return this.topicId;
     }
 
-    public setTopicId(topicId: string): void {
+    public setTopicId(topicId: number): void {
         this.topicId = topicId;
     }
 

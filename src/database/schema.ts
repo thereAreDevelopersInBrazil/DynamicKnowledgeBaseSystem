@@ -21,15 +21,18 @@ export const topics = sqliteTable('topics', {
     content: text(),
     version: integer().default(1),
     parentTopicId: integer().references((): AnySQLiteColumn => topics.id),
-    ...timeStampsSchemas
+    ...timeStampsSchemas,
+    isDeleted: integer({ mode: 'boolean' }).default(false)
 });
 
-
-export const topics_tree = sqliteTable('topics_tree', {
+export const topics_versions = sqliteTable('topics_versions', {
     ...idSchema,
     topicId: integer().references((): AnySQLiteColumn => topics.id),
-    position: integer().notNull(),
-    nodeTopicId: integer().notNull()
+    name: text().notNull(),
+    content: text(),
+    version: integer().default(1),
+    parentTopicId: integer().references((): AnySQLiteColumn => topics.id),
+    ...timeStampsSchemas
 });
 
 export const resources = sqliteTable('resources', {
