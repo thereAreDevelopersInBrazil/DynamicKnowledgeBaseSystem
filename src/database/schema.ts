@@ -48,6 +48,8 @@ export const users = sqliteTable('users', {
     ...idSchema,
     name: text().notNull(),
     email: text().notNull(),
+    password: text().notNull(),
     role: text().$type<Users.Roles>().notNull(),
+    isDeleted: integer({ mode: 'boolean' }).default(false).notNull(),
     ...timeStampsSchemas
 });

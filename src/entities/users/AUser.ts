@@ -1,39 +1,53 @@
 import { AEntity } from "../abstracts/AEntity";
 import { Users } from "../../schemas";
+import { isPermission } from "../../utils/permissions";
+import { Permissions } from "../../types";
 
 export abstract class AUser extends AEntity {
-    protected name: string;
-    protected email: string;
-    protected role: Users.Roles;
+    protected props: Users.Shape;
+    protected permissions: Permissions[] = [];
 
-    constructor(user: Users.Shape) {
-        super(user);
-        this.name = user.name;
-        this.email = user.email;
-        this.role = user.role;
+    constructor(props: Users.Shape) {
+        super(props);
+        this.props = props;
+    }
+
+    public hasPermission(action: string): boolean {
+        if (isPermission(action)) {
+            return this.permissions.includes(action);
+        }
+        return false;
     }
 
     public getName(): string {
-        return this.name;
+        return this.props.name;
     }
 
     public setName(name: string): void {
-        this.name = name;
+        this.props.name = name;
     }
 
     public getEmail(): string {
-        return this.email;
+        return this.props.email;
     }
 
     public setEmail(email: string): void {
-        this.email = email;
+        this.props.email = email;
+    }
+
+    public getPassword(): string {
+        return this.props.password;
+    }
+
+    public setPassword(password: string): void {
+        this.props.password = password;
     }
 
     public getRole(): Users.Roles {
-        return this.role;
+        return this.props.role;
     }
 
     public setRole(role: Users.Roles): void {
-        this.role = role;
+        this.props.role = role;
     }
 }

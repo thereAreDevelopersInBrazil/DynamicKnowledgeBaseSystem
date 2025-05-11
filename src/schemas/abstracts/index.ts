@@ -7,12 +7,13 @@ export const idSchema = z.object({
 });
 
 export const timed = z.object({
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
 });
 
 export const schema = z.object({
-  id,
+  id: id.nullable(),
+  isDeleted: z.boolean().optional()
 }).merge(timed);
 
 export type Shape = z.infer<typeof schema>;

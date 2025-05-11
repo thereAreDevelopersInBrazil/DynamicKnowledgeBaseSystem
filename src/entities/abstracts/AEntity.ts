@@ -2,30 +2,28 @@ import { Abstracts } from '../../schemas';
 
 export abstract class AEntity {
 
-    protected id: number;
-    protected createdAt: string;
-    protected updatedAt: string;
+    protected props: Abstracts.Shape;
 
-    constructor(entity: Abstracts.Shape) {
-        this.id = entity.id;
+    constructor(props: Abstracts.Shape) {
+        this.props = props;
         const now = new Date().toISOString();
-        this.createdAt = entity.createdAt ? entity.createdAt : now;
-        this.updatedAt = entity.updatedAt ? entity.updatedAt : now;
+        this.props.createdAt ??= now;
+        this.props.updatedAt ??= now;
     }
 
     getId(): number {
-        return this.id;
+        return this.props.id;
     }
 
     getCreatedAt(): string {
-        return this.createdAt;
+        return this.props.createdAt;
     }
 
     getUpdatedAt(): string {
-        return this.updatedAt;
+        return this.props.updatedAt;
     }
 
     protected touch() {
-        this.updatedAt = new Date().toISOString();
+        this.props.updatedAt = new Date().toISOString();
     }
 }

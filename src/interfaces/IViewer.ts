@@ -1,3 +1,3 @@
 export interface IViewer {
-    leaveAnEditingSuggestion(): void;
+    viwerFeature(): void;
 }

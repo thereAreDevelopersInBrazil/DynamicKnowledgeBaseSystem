@@ -1,3 +1,3 @@
 export interface IAdmin {
-    deleteThings(): void;
+    adminExclusiveFeature(): void;
 }

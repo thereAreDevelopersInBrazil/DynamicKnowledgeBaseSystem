@@ -1,9 +1,12 @@
 import { AUser } from "./AUser";
 import { Users } from "../../schemas";
+import { isPermissions } from "../../utils/permissions";
+import { VIEWER } from "../../constants/permissions";
 
 export class Viewer extends AUser {
     constructor(viewer: Users.Shape) {
         super(viewer);
+        this.permissions = isPermissions(VIEWER) ? VIEWER : [];
     }
 
     /**

@@ -1,3 +1,3 @@
 export interface IEditor {
-    editThings(): void;
+    editorFeature(): void;
 }
