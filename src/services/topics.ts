@@ -2,7 +2,7 @@ import { z } from "zod";
 import { HTTPSTATUS } from "../constants/http";
 import { Topic } from "../entities/topics";
 import { ExpectedError } from "../errors";
-import { insert as insertTopics, getById, getChildren, getSiblings, getFirstTopic, storeVersion, getNumberOfPreviousVersions, updateSingleProperty, update } from "../repositories/topics";
+import { insert as insertTopics, getById, getChildren, getSiblings, storeVersion, getNumberOfPreviousVersions, updateSingleProperty, update } from "../repositories/topics";
 import { Topics } from "../schemas";
 import { PatchShape } from "../schemas/abstracts";
 import { contentSchema, nameSchema } from "../schemas/topics";
@@ -23,7 +23,7 @@ export async function createTopic(topic: Topic): Promise<number | bigint> {
 
 export async function fullUpdateTopic(id: number, data: Topics.Shape): Promise<Topics.Shape> {
   const targetResult = await getById(Number(id));
-  if (!targetResult) {
+  if (!targetResult || !targetResult.id) {
     throw new ExpectedError(HTTPSTATUS.NOT_FOUND, `There are no topics with id ' ${id} to be updated!`);
   }
 

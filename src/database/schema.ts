@@ -13,6 +13,7 @@ const timeStampsSchemas = {
     updatedAt: text('updated_at')
         .notNull()
         .default(sql`CURRENT_TIMESTAMP`)
+        .$onUpdateFn(() => new Date().toISOString())
 };
 
 export const topics = sqliteTable('topics', {
@@ -47,7 +48,7 @@ export const resources = sqliteTable('resources', {
 export const users = sqliteTable('users', {
     ...idSchema,
     name: text().notNull(),
-    email: text().notNull(),
+    email: text().notNull().unique(),
     password: text().notNull(),
     role: text().$type<Users.Roles>().notNull(),
     isDeleted: integer({ mode: 'boolean' }).default(false).notNull(),

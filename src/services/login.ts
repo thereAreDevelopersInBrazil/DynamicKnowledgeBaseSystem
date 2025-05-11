@@ -7,6 +7,7 @@ import * as jwt from "jsonwebtoken";
 
 export async function login(email: string, password: string) {
     const result = await getByEmail(email);
+    console.log(result);
     const message = 'The provided email or password are incorrect! Check and try again!';
     if (!result) {
         throw new ExpectedError(HTTPSTATUS.UNAUTHORIZED, message);

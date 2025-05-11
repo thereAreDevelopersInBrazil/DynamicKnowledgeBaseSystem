@@ -1,17 +1,18 @@
 import { dbClient } from '../database/client';
 import { users } from '../database/schema';
 import { AUser } from '../entities/users/AUser';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import { ExpectedError } from '../errors';
 import { HTTPSTATUS } from '../constants/http';
 import { Users } from '../schemas';
 import { buildUser } from '../factories/users';
+import { encrypt } from '../utils/cryptography';
 
 export async function insert(user: AUser): Promise<number> {
     const result = await dbClient.insert(users).values({
         name: user.getName(),
         email: user.getEmail(),
-        password: user.getPassword(),
+        password: await encrypt(user.getPassword()),
         role: user.getRole()
     });
 
@@ -87,13 +88,14 @@ export async function getById(id: number): Promise<AUser | null> {
     return buildUser(result);
 }
 
-export async function getByEmail(email: string): Promise<AUser | null> {
+export async function getByEmail(email: string, exclude: number | null): Promise<AUser | null> {
     const [result] = await dbClient.select()
         .from(users)
         .where(
             and(
                 eq(users.isDeleted, false),
-                eq(users.email, email)
+                eq(users.email, email),
+                exclude ? ne(users.id, exclude) : undefined
             )
         );
 
@@ -104,23 +106,25 @@ export async function getByEmail(email: string): Promise<AUser | null> {
     return buildUser(result);
 }
 
-export async function update(original: Users.Shape, updated: Users.Shape): Promise<boolean> {
+export async function update(id: number, entity: AUser): Promise<boolean> {
     const result = await dbClient
         .update(users)
-        .set(updated)
-        .where(eq(users.id, original.id));
+        .set({
+            name: entity.getName(),
+            email: entity.getEmail(),
+            password: entity.getPassword(),
+            role: entity.getRole()
+        })
+        .where(eq(users.id, id));
 
     return result.changes > 0;
 }
 
-export async function updateSingleProperty(original: Users.Shape, prop: string, value: string): Promise<boolean> {
+export async function updateSingleProperty(id: number, prop: string, value: string): Promise<boolean> {
     const result = await dbClient
         .update(users)
-        .set({
-            [prop]: value,
-            updatedAt: new Date().toISOString()
-        })
-        .where(eq(users.id, original.id));
+        .set({ [prop]: value })
+        .where(eq(users.id, id));
 
     return result.changes > 0;
 }

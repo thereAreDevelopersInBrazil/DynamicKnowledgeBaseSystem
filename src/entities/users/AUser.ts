@@ -50,4 +50,15 @@ export abstract class AUser extends AEntity {
     public setRole(role: Users.Roles): void {
         this.props.role = role;
     }
+
+    public toJson(): object {
+        return {
+            id: this.getId(),
+            name: this.getName(),
+            email: this.getEmail(),
+            role: this.getRole(),
+            createdAt: this.getCreatedAt(),
+            updatedAt: this.getUpdatedAt()
+        };
+    }
 }
