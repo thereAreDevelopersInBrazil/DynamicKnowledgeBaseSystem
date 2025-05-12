@@ -8,10 +8,9 @@ export async function seeds() {
         id: 1,
         email: "system@default.com",
         name: "System",
-        password: await encrypt("@DynamicKnowledge2025@"),
+        password: encrypt("@DynamicKnowledge2025@"),
         role: "Admin" as Users.Roles,
     }
     const userEntity = new Admin(defaultUserShape);
-
     await replace(userEntity);
 }

@@ -2,21 +2,21 @@ import { Request, Response } from 'express';
 import { HTTPSTATUS } from '../../constants/http';
 import { responseErrorHandler } from '../../utils/requestErrorHandler';
 import { fullUpdateUser } from '../../services/users';
-import { getById } from '../../repositories/users';
-import { ExpectedError } from '../../errors';
+import { Users } from '../../schemas';
+import { buildUser } from '../../factories/users';
 
 export const Put = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
-        const user = await getById(id);
-        if (!user) {
-            throw new ExpectedError(HTTPSTATUS.NOT_FOUND, `There are no users with id ${id} to be updated!`);
+        const props: Users.Shape = {
+            id: 0,
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            role: req.body.role
         }
-        user.setName(req.body.name);
-        user.setEmail(req.body.email);
-        user.setPassword(req.body.password);
-        user.setRole(req.body.role);
-        const updated = await fullUpdateUser(id, user);
+        const toUpdate = buildUser(props);
+        const updated = await fullUpdateUser(id, toUpdate);
         res.status(HTTPSTATUS.OK).json(updated.toJson()).end();
     } catch (error) {
         responseErrorHandler(error, res);

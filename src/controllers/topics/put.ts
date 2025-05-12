@@ -1,23 +1,23 @@
 import { Request, Response } from 'express';
 import { HTTPSTATUS } from '../../constants/http';
+import { responseErrorHandler } from '../../utils/requestErrorHandler';
+import { Topic } from '../../entities/topics';
+import { Topics } from '../../schemas';
 import { fullUpdateTopic } from '../../services/topics';
-import { ExpectedError } from '../../errors';
 
 export const Put = async (req: Request, res: Response) => {
-
     try {
-        const result = await fullUpdateTopic(Number(req.params.id), req.body);
-        res.status(HTTPSTATUS.OK).json(result).end();
-    } catch (error) {
-        if (error instanceof ExpectedError) {
-            res.status(error.status).json({
-                error: error.message,
-                ...(error.details ? { details: error.details } : {})
-            })
+        const id = Number(req.params.id);
+        const props: Topics.Shape = {
+            id: 0,
+            name: req.body.name,
+            content: req.body.content,
+            parentTopicId: req.body.parentTopicId
         }
-        res.status(HTTPSTATUS.SERVER_ERROR).json({
-            error: `Unexpected error while updating the topic!`,
-            details: error
-        }).end();
+        const toUpdate = new Topic(props);
+        const updated = await fullUpdateTopic(id, toUpdate);
+        res.status(HTTPSTATUS.OK).json(updated.toJson()).end();
+    } catch (error) {
+        responseErrorHandler(error, res);
     }
 };

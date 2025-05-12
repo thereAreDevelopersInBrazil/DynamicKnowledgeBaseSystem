@@ -12,7 +12,7 @@ export const timed = z.object({
 });
 
 export const schema = z.object({
-  id: id.nullable(),
+  id,
   isDeleted: z.boolean().optional()
 }).merge(timed);
 
@@ -43,3 +43,4 @@ export const patchSchema = z.object({
 });
 
 export type PatchShape = z.infer<typeof patchSchema>;
+export type PatchPossibleValues = z.infer<typeof possiblyJsonValues>;

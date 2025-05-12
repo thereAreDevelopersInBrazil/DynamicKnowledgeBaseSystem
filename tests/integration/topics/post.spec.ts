@@ -1,12 +1,19 @@
-import request from "supertest";
-import server from "../../server";
-import { HTTPSTATUS } from "../../constants/http";
-import { createTopic, getTopicWithParentsById } from "../../services/topics";
-import { VALID_TOPIC } from "../../mocks";
+jest.mock('../../../src/middlewares/authenticator', () => ({
+    authenticator: () => (_req: any, _res: any, next: any) => next(),
+}));
 
-jest.mock('../../services/topics', () => ({
+jest.mock('../../../src/middlewares/roleChecker', () => ({
+    roleChecker: () => (_req: any, _res: any, next: any) => next(),
+}));
+
+import request from "supertest";
+import server from "../../../src/server";
+import { HTTPSTATUS } from "../../../src/constants/http";
+import { createTopic } from "../../../src/services/topics";
+import { VALID_TOPIC } from "../../../src/mocks";
+
+jest.mock('../../../src/services/topics', () => ({
     createTopic: jest.fn(),
-    getTopicWithParentsById: jest.fn()
 }));
 
 describe('Test POST /topics route', () => {
@@ -30,22 +37,21 @@ describe('Test POST /topics route', () => {
 
         const response = await request(server)
             .post('/topics')
-            .send(VALID_TOPIC);
+            .send(VALID_TOPIC.toJson());
 
         expect(response.statusCode).toEqual(HTTPSTATUS.SERVER_ERROR);
         expect(response.body).toHaveProperty("error");
     });
 
     it('should be an 200 if everything goes well', async () => {
-        (createTopic as jest.Mock).mockResolvedValue(999);
-        (getTopicWithParentsById as jest.Mock).mockResolvedValue(VALID_TOPIC);
+        (createTopic as jest.Mock).mockResolvedValue(VALID_TOPIC);
 
         const response = await request(server)
             .post('/topics')
-            .send(VALID_TOPIC);
+            .send(VALID_TOPIC.toJson());
 
         expect(response.statusCode).toEqual(HTTPSTATUS.OK);
-        expect(response.body).toMatchObject(VALID_TOPIC);
+        expect(response.body).toMatchObject(VALID_TOPIC.toJson());
     });
 
 });

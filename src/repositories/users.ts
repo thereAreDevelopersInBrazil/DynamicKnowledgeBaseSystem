@@ -6,13 +6,14 @@ import { ExpectedError } from '../errors';
 import { HTTPSTATUS } from '../constants/http';
 import { Users } from '../schemas';
 import { buildUser } from '../factories/users';
-import { encrypt } from '../utils/cryptography';
+import { PatchPossibleValues } from '../schemas/abstracts';
 
 export async function insert(user: AUser): Promise<number> {
+
     const result = await dbClient.insert(users).values({
         name: user.getName(),
         email: user.getEmail(),
-        password: await encrypt(user.getPassword()),
+        password: user.getPassword(),
         role: user.getRole()
     });
 
@@ -88,7 +89,7 @@ export async function getById(id: number): Promise<AUser | null> {
     return buildUser(result);
 }
 
-export async function getByEmail(email: string, exclude: number | null): Promise<AUser | null> {
+export async function getByEmail(email: string, exclude: number | null = null): Promise<AUser | null> {
     const [result] = await dbClient.select()
         .from(users)
         .where(
@@ -120,7 +121,7 @@ export async function update(id: number, entity: AUser): Promise<boolean> {
     return result.changes > 0;
 }
 
-export async function updateSingleProperty(id: number, prop: string, value: string): Promise<boolean> {
+export async function updateSingleProperty(id: number, prop: string, value: PatchPossibleValues): Promise<boolean> {
     const result = await dbClient
         .update(users)
         .set({ [prop]: value })
@@ -131,9 +132,10 @@ export async function updateSingleProperty(id: number, prop: string, value: stri
 
 
 export async function logicalDeletion(id: number): Promise<boolean> {
+    const user = await getById(id);
     const result = await dbClient
         .update(users)
-        .set({ isDeleted: true })
+        .set({ email: "deleted_" + user?.getEmail(), isDeleted: true })
         .where(eq(users.id, id));
 
     return result.changes > 0;

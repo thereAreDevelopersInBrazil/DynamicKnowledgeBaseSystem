@@ -3,72 +3,71 @@ import { Topics } from "../../schemas";
 
 export class Topic extends AEntity {
 
-    private name: string;
-    private content?: string | null;
-    private version?: number | null;
-    private parentTopicId: number | null;
-    private parent: Topic | null = null;
-    private children: Topic[] = [];
+    protected props: Omit<Topics.Shape, 'parent' | 'children'> & {
+        parent: Topic | null;
+        children: Topic[];
+    };
 
+    constructor(props: Topics.Shape) {
+        super(props);
 
-    constructor(topic: Topics.Shape) {
-        super(topic);
-        this.name = topic.name;
-        this.content = topic.content;
-        this.version = topic.version;
-        this.parentTopicId = topic.parentTopicId;
+        this.props = {
+            ...props,
+            parent: props.parent ? new Topic(props.parent) : null,
+            children: (props.children ?? []).map(child => new Topic(child))
+        };
     }
 
     public getName(): string {
-        return this.name;
+        return this.props.name;
     }
 
     public setName(name: string): void {
-        this.name = name;
+        this.props.name = name;
     }
 
     public getContent(): string | undefined | null {
-        return this.content;
+        return this.props.content;
     }
 
     public setContent(content: string | undefined | null): void {
-        this.content = content;
+        this.props.content = content;
     }
 
     public getVersion(): number | undefined | null {
-        return this.version;
+        return this.props.version;
     }
 
     public setVersion(version: number | undefined | null): void {
-        this.version = version;
+        this.props.version = version;
     }
 
     public getParentTopicId(): number | null {
-        return this.parentTopicId;
+        return this.props.parentTopicId;
     }
 
     public setParentTopicId(parentTopicId: number | null): void {
-        this.parentTopicId = parentTopicId;
+        this.props.parentTopicId = parentTopicId;
     }
 
     public getParent(): Topic | null {
-        return this.parent;
+        return this.props.parent;
     }
 
     public setParent(parent: Topic | null): void {
-        this.parent = parent;
+        this.props.parent = parent;
     }
 
     public getChildren(): Topic[] {
-        return this.children;
+        return this.props.children;
     }
 
     public setChildren(children: Topic): void {
-        this.children.push(children);
+        this.props.children.push(children);
     }
 
 
-    public toJSON(): object {
+    public toJson(): object {
         return {
             id: this.getId(),
             name: this.getName(),
@@ -77,9 +76,8 @@ export class Topic extends AEntity {
             parentTopicId: this.getParentTopicId(),
             createdAt: this.getCreatedAt(),
             updatedAt: this.getUpdatedAt(),
-            ...(this.parent ? { parent: this.parent.toJSON() } : {}),
-            children: this.children.map(child => child.toJSON()),
-            
+            ...(this.props.parent ? { parent: this.props.parent.toJson() } : {}),
+            children: this.props.children.map(child => child.toJson()),
         };
     }
 }

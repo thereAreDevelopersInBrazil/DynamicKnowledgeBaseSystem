@@ -1,10 +1,18 @@
-import request from "supertest";
-import server from "../../server";
-import { HTTPSTATUS } from "../../constants/http";
-import { partialUpdateTopic } from "../../services/topics";
-import { VALID_RFC6902_PATCH, VALID_TOPIC } from "../../mocks";
+jest.mock('../../../src/middlewares/authenticator', () => ({
+    authenticator: () => (_req: any, _res: any, next: any) => next(),
+}));
 
-jest.mock('../../services/topics', () => ({
+jest.mock('../../../src/middlewares/roleChecker', () => ({
+    roleChecker: () => (_req: any, _res: any, next: any) => next(),
+}));
+
+import request from "supertest";
+import server from "../../../src/server";
+import { HTTPSTATUS } from "../../../src/constants/http";
+import { partialUpdateTopic } from "../../../src/services/topics";
+import { VALID_RFC6902_PATCH, VALID_TOPIC } from "../../../src/mocks";
+
+jest.mock('../../../src/services/topics', () => ({
     partialUpdateTopic: jest.fn()
 }));
 
@@ -42,7 +50,7 @@ describe('Test PATCH /topics route', () => {
                                 .send(VALID_RFC6902_PATCH);
 
         expect(response.statusCode).toEqual(HTTPSTATUS.OK);
-        expect(response.body).toMatchObject(VALID_TOPIC);
+        expect(response.body).toMatchObject(VALID_TOPIC.toJson());
     });
 
 });

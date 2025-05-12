@@ -23,7 +23,7 @@ export const topics = sqliteTable('topics', {
     version: integer().default(1),
     parentTopicId: integer().references((): AnySQLiteColumn => topics.id),
     ...timeStampsSchemas,
-    isDeleted: integer({ mode: 'boolean' }).default(false)
+    isDeleted: integer({ mode: 'boolean' }).default(false).notNull()
 });
 
 export const topics_versions = sqliteTable('topics_versions', {
@@ -36,19 +36,28 @@ export const topics_versions = sqliteTable('topics_versions', {
     ...timeStampsSchemas
 });
 
+export const resources_topics = sqliteTable('resources_topics', {
+    ...idSchema,
+    resourceId: integer().references((): AnySQLiteColumn => resources.id).notNull(),
+    topicId: integer().references((): AnySQLiteColumn => topics.id).notNull(),
+});
+
+
 export const resources = sqliteTable('resources', {
     ...idSchema,
-    topicId: integer().references((): AnySQLiteColumn => topics.id).notNull(),
     url: text().notNull(),
     description: text().notNull(),
     type: text().$type<Resources.Types>().notNull(),
+    details: text({ mode: 'json' }).$type<Resources.TypesDetails>().notNull(),
+    isDeleted: integer({ mode: 'boolean' }).default(false).notNull(),
     ...timeStampsSchemas
 });
 
 export const users = sqliteTable('users', {
     ...idSchema,
     name: text().notNull(),
-    email: text().notNull().unique(),
+    //I REMOVED THE .unique() from email cause sqlite dosent support CREATE INDEX IF NOT EXISTS and always try to create it crashing the app start when npx drizzle-kit push runs
+    email: text().notNull(),
     password: text().notNull(),
     role: text().$type<Users.Roles>().notNull(),
     isDeleted: integer({ mode: 'boolean' }).default(false).notNull(),

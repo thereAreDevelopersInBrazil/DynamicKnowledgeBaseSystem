@@ -4,7 +4,7 @@
   "description": "This system should manage interconnected topics and resources with version control, user roles, and permissions.",
   "main": "index.ts",
   "scripts": {
-    "dev": "npx drizzle-kit generate && npx drizzle-kit push && tsnd --respawn --transpile-only src/index.ts",
+    "dev": "npx drizzle-kit push && tsnd --respawn --transpile-only src/index.ts",
     "test": "jest",
     "build": "tsc",
     "start": "node ./dist/src/index.js"

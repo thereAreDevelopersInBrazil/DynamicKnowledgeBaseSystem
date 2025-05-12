@@ -16,14 +16,10 @@ export abstract class AEntity {
     }
 
     getCreatedAt(): string {
-        return this.props.createdAt;
+        return this.props.createdAt ? this.props.createdAt : new Date().toISOString();
     }
 
     getUpdatedAt(): string {
-        return this.props.updatedAt;
-    }
-
-    protected touch() {
-        this.props.updatedAt = new Date().toISOString();
+        return this.props.updatedAt ? this.props.updatedAt : new Date().toISOString();
     }
 }

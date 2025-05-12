@@ -1,31 +1,29 @@
 import { AResource } from "./AResource";
 import { Resources } from "../../schemas";
 
-export class Video extends AResource {
+export class Video extends AResource<'Video'> {
 
-    /**
-     * We also could have Video specific properties like:
-     * Duration, format, quality, etc...
-    */
-
-    constructor(video: Resources.Shape) {
+    constructor(video: Resources.Shape<'Video'>) {
         super(video);
     }
 
-    /**
-     * Because there are no resource type-specific use cases in the current challenge scope,
-     * I decided to include those methods for demonstration purposes
-     * I did not turn them into interfaces cause differently from users-related interfaces
-     * I would not have reuse/multiple implementations of the same interface
-     * So it would be useless, overengineering
-     * 
-    */
-
-    public play(): void {
-
+    public getDuration(): string {
+        return this.props.details.duration;
     }
 
-    public pause(): void {
+    public setDuration(duration: string): void {
+        this.props.details.duration = duration;
+    }
 
+    public toJson(): object {
+        return {
+            id: this.getId(),
+            url: this.getUrl(),
+            description: this.getDescription(),
+            type: this.getType(),
+            ...(this.getDuration() ? { duration: this.getDuration() } : { details: this.getDetails() }),
+            createdAt: this.getCreatedAt(),
+            updatedAt: this.getUpdatedAt()
+        };
     }
 }

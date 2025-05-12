@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import { HTTPSTATUS } from '../../constants/http';
 import { responseErrorHandler } from '../../utils/requestErrorHandler';
-import { partialUpdateTopic } from '../../services/topics';
+import { partialUpdateResource } from '../../services/resources';
 
 export const Patch = async (req: Request, res: Response) => {
     try {
-        const topic = await partialUpdateTopic(Number(req.params.id), req.body);
-        res.status(HTTPSTATUS.OK).json(topic.toJson()).end();
+        const id = Number(req.params.id);
+
+        const updated = await partialUpdateResource(id, req.body);
+        res.status(HTTPSTATUS.OK).json(updated.toJson()).end();
     } catch (error) {
         responseErrorHandler(error, res);
     }

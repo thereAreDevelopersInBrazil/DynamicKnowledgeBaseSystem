@@ -1,11 +1,19 @@
-import request from "supertest";
-import server from "../../server";
-import { HTTPSTATUS } from "../../constants/http";
-import { findShortestPathBetweenTopics } from "../../services/topics";
-import { VALID_PATH } from "../../mocks";
+jest.mock('../../../src/middlewares/authenticator', () => ({
+    authenticator: () => (_req: any, _res: any, next: any) => next(),
+}));
 
-jest.mock('../../services/topics', () => ({
-    findShortestPathBetweenTopics: jest.fn(),
+jest.mock('../../../src/middlewares/roleChecker', () => ({
+    roleChecker: () => (_req: any, _res: any, next: any) => next(),
+}));
+
+import request from "supertest";
+import server from "../../../src/server";
+import { HTTPSTATUS } from "../../../src/constants/http";
+import { findPath } from "../../../src/services/topicsPath";
+import { VALID_PATH } from "../../../src/mocks";
+
+jest.mock('../../../src/services/topicsPath', () => ({
+    findPath: jest.fn(),
 }));
 
 describe('Test GET /topics/path route', () => {
@@ -31,7 +39,7 @@ describe('Test GET /topics/path route', () => {
     });
 
     it('should be an 500 if some error happens during the search', async () => {
-        (findShortestPathBetweenTopics as jest.Mock).mockRejectedValue(new Error("Some error"));
+        (findPath as jest.Mock).mockRejectedValue(new Error("Some error"));
 
         const response = await request(server).get('/topics/path?origin_topic_id=999&target_topic_id=999');
 
@@ -40,7 +48,7 @@ describe('Test GET /topics/path route', () => {
     });
 
     it('should be an 200 if find the path between the topics', async () => {
-        (findShortestPathBetweenTopics as jest.Mock).mockResolvedValue(VALID_PATH);
+        (findPath as jest.Mock).mockResolvedValue(VALID_PATH);
         const response = await request(server).get('/topics/path?origin_topic_id=999&target_topic_id=999');
 
         expect(response.statusCode).toEqual(HTTPSTATUS.OK);
@@ -48,7 +56,7 @@ describe('Test GET /topics/path route', () => {
     });
 
     it('should be an 200 if does not find the path between the topics (But will never happen if topics exists!)', async () => {
-        (findShortestPathBetweenTopics as jest.Mock).mockResolvedValue(false);
+        (findPath as jest.Mock).mockResolvedValue(false);
         const response = await request(server).get('/topics/path?origin_topic_id=999&target_topic_id=999');
 
         expect(response.statusCode).toEqual(HTTPSTATUS.OK);

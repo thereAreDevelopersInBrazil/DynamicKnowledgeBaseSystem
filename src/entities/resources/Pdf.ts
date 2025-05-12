@@ -1,27 +1,29 @@
 import { AResource } from "./AResource";
 import { Resources } from "../../schemas";
 
-export class Pdf extends AResource {
+export class Pdf extends AResource<'Pdf'> {
 
-    /**
-     * We also could have Pdf specific properties like:
-     * File size, last time file was modified, etc...
-    */
-
-    constructor(pdf: Resources.Shape) {
+    constructor(pdf: Resources.Shape<'Pdf'>) {
         super(pdf);
     }
 
-    /**
-     * Because there are no resource type-specific use cases in the current challenge scope,
-     * I decided to include those methods for demonstration purposes
-     * I did not turn them into interfaces cause differently from users-related interfaces
-     * I would not have reuse/multiple implementations of the same interface
-     * So it would be useless, overengineering
-     * 
-    */
+    public getFileSize(): number {
+        return this.props.details.fileSize;
+    }
 
-    public print(): void {
+    public setFileSize(fileSize: number): void {
+        this.props.details.fileSize = fileSize;
+    }
 
+    public toJson(): object {
+        return {
+            id: this.getId(),
+            url: this.getUrl(),
+            description: this.getDescription(),
+            type: this.getType(),
+            ...(this.getFileSize() ? { fileSize: this.getFileSize() } : { details: this.getDetails() }),
+            createdAt: this.getCreatedAt(),
+            updatedAt: this.getUpdatedAt()
+        };
     }
 }

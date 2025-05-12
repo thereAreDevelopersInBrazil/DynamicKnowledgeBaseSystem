@@ -9,17 +9,17 @@ import { getById } from '../repositories/users';
 export const authenticator = () => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const auth = req.headers['authorization'];
-    if (!auth) {
-      throw new ExpectedError(HTTPSTATUS.UNAUTHORIZED, 'Unauthorized');
-    }
-
-    if (!auth.startsWith('Bearer ')) {
-      throw new ExpectedError(HTTPSTATUS.UNAUTHORIZED, 'Unauthorized');
-    }
-
-    const token = auth.split(' ')[1];
-
     try {
+      if (!auth) {
+        throw new ExpectedError(HTTPSTATUS.UNAUTHORIZED, 'Unauthorized');
+      }
+
+      if (!auth.startsWith('Bearer ')) {
+        throw new ExpectedError(HTTPSTATUS.UNAUTHORIZED, 'Unauthorized');
+      }
+
+      const token = auth.split(' ')[1];
+
       const decoded = jwt.verify(token, JWT_SECRET);
 
       if (typeof decoded == 'string') {

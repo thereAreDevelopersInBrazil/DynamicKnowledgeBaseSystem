@@ -1,8 +1,8 @@
-import { Topics } from "../schemas";
+import { Topic } from "../entities/topics";
 import { PatchShape } from "../schemas/abstracts";
-import { ExecutedInstruction } from "../services/topics";
+import { ExecutedInstruction } from "../types";
 
-export const VALID_TOPIC: Topics.Shape = {
+export const VALID_TOPIC = new Topic({
     id: 17,
     name: "Topic 018",
     content: "Topic 018 content!",
@@ -11,7 +11,7 @@ export const VALID_TOPIC: Topics.Shape = {
     createdAt: "2025-05-04 17:37:45",
     updatedAt: "2025-05-04 17:37:45",
     children: []
-};
+});
 
 
 export const VALID_PATH: ExecutedInstruction[] = [
