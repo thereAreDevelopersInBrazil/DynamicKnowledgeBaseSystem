@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { schema as AEntitySchema } from '../abstracts';
+import { schema as AEntitySchema, id } from '../abstracts';
+import * as Resources from '../resources';
 
 export const getSchema = z.object({
     version: z.coerce
@@ -22,14 +23,25 @@ export const getPathSchema = z.object({
 
 export const nameSchema = z.string().min(1, { message: 'The topic name should have at least 1 character!' });
 export const contentSchema = z.string({ message: 'If provided, the topic content should be an valid string!' }).optional().nullable();
+export const parentTopicIdSchema = z.number({ message: "The parent topic id is required! If you want to create new root topic send 'null' it will be accepted!" })
+    .nullable();
+
 export const base = z.object({
     name: nameSchema,
     content: contentSchema,
-    parentTopicId: z.number({ message: "The parent topic id is required! If you want to create new root topic send 'null' it will be accepted!" })
-        .nullable()
+    parentTopicId: parentTopicIdSchema,
+    resources: z.array(Resources.base).optional().default([])
+});
+
+export const requestSchema = z.object({
+    name: nameSchema,
+    content: contentSchema,
+    parentTopicId: parentTopicIdSchema,
+    resources: Resources.requestsSchema.optional()
 });
 
 export const internal = z.object({ version: z.number({ message: 'The topic version should be an number!' }).optional().nullable() });
+
 
 export const schema = base.merge(internal).merge(AEntitySchema);
 

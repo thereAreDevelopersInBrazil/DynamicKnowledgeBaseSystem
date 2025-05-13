@@ -43,7 +43,6 @@ describe('Test GET /topics route', () => {
         (retrieveAnTopic as jest.Mock).mockResolvedValue(VALID_TOPIC);
 
         const response = await request(server).get('/topics/999');
-
         expect(response.statusCode).toEqual(HTTPSTATUS.OK);
         expect(response.body).toMatchObject(VALID_TOPIC.toJson());
     });

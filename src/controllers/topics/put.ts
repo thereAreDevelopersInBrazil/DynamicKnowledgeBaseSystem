@@ -12,11 +12,20 @@ export const Put = async (req: Request, res: Response) => {
             id: 0,
             name: req.body.name,
             content: req.body.content,
-            parentTopicId: req.body.parentTopicId
+            parentTopicId: req.body.parentTopicId,
+            resources: req.body.resources
         }
         const toUpdate = new Topic(props);
-        const updated = await fullUpdateTopic(id, toUpdate);
-        res.status(HTTPSTATUS.OK).json(updated.toJson()).end();
+        const response = await fullUpdateTopic(id, toUpdate, req.body.resources);
+        const updatedTopic = response.response as Topic;
+        if (response.warnings.length > 0) {
+            res.status(HTTPSTATUS.OK).json({
+                ...updatedTopic.toJson(),
+                warnings: response.warnings
+            }).end();
+        } else {
+            res.status(HTTPSTATUS.OK).json(updatedTopic.toJson()).end();
+        }
     } catch (error) {
         responseErrorHandler(error, res);
     }

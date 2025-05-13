@@ -20,3 +20,8 @@ type SearchTree = {
     down: ExecutedInstruction[],
     sides: ExecutedInstruction[]
 }
+
+type WarningExposedResponse = {
+    response: unknown,
+    warnings: string[]
+}

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { schema as AEntitySchema } from '../abstracts';
+import { schema as AEntitySchema, id, idSchema } from '../abstracts';
 export const urlSchema = z.string().url({ message: 'The user email should be in an valid URL format!' });
 export const descriptionSchema = z.string().min(3, { message: 'You must provide an short description for the resource!' });
 export const typeSchema = z.enum(['Video', 'Article', 'Pdf']);
@@ -31,7 +31,6 @@ export const base = z.object({
     type: typeSchema,
     details: detailsSchema
 });
-
 export const schema = base.merge(AEntitySchema);
 
 export type Types = z.infer<typeof typeSchema>;
@@ -47,3 +46,9 @@ export type Shape<T extends Types = Types> = Omit<z.infer<typeof schema>, 'detai
     type: T;
     details: DetailsMap[T];
 };
+
+export const requestsSchema = z.array(
+    z.union([id, base], { message: "Each resource must be a valid ID or resource object!" })
+);
+export type RequestsShape = z.infer<typeof requestsSchema>;
+export type BaseShape = z.infer<typeof base>;

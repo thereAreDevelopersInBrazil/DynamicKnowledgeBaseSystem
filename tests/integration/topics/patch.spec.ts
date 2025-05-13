@@ -43,7 +43,7 @@ describe('Test PATCH /topics route', () => {
     });
 
     it('should be an 200 to call the API following RFC 6902 for body format ', async () => {
-        (partialUpdateTopic as jest.Mock).mockResolvedValue(VALID_TOPIC);
+        (partialUpdateTopic as jest.Mock).mockResolvedValue({response:VALID_TOPIC, warnings: []});
         
         const response = await request(server)
                                 .patch('/topics/999')

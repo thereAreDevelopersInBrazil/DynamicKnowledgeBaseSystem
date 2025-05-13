@@ -7,6 +7,8 @@ import { AResource } from "../entities/resources/AResource";
 import { Resources } from "../schemas";
 import { articleSchema, pdfSchema, TypesDetails, videoSchema } from "../schemas/resources";
 import { patchValueIsDetail } from "../utils/resources";
+import { attach } from "../repositories/resourcesTopics";
+import { WarningExposedResponse } from "../types";
 
 export async function retrieveAnResource(id: number): Promise<AResource<Resources.Types>> {
   const resource = await getById(id);
@@ -28,7 +30,7 @@ export async function createResource(resource: AResource<Resources.Types>): Prom
   const sameUrl = await getByUrl(resource.getUrl());
 
   if (sameUrl) {
-    throw new ExpectedError(HTTPSTATUS.UNPROCESSABLE, `This URL is already registered in the resource ID ${sameUrl.getId()}! If you want to change its description or type please edit it instead!`);
+    throw new ExpectedError(HTTPSTATUS.UNPROCESSABLE, `The URL ${sameUrl.getUrl()} is already registered in the resource ID ${sameUrl.getId()}! If you want to change its description or type please edit it instead!`);
   }
 
   validateDetails(resource.getType(), resource.getDetails());
@@ -165,4 +167,19 @@ function validateDetails(type: string, details: TypesDetails) {
   } catch (error) {
     throw new ExpectedError(HTTPSTATUS.BAD_REQUEST, `Invalid details for ${type}!`, error);
   }
+}
+
+export async function attachResourcesToTopics(resources: AResource<Resources.Types>[], topicId: number): Promise<WarningExposedResponse> {
+  const warnings: string[] = [];
+  for (const resource of resources) {
+    try {
+      await attach(resource.getId(), topicId);
+    } catch (error) {
+      warnings.push(`Unexpected error happened while attaching resource id ${resource} to topic id ${topicId}! Details: ${error}`);
+    }
+  }
+  return {
+    response: true,
+    warnings: warnings
+  };
 }

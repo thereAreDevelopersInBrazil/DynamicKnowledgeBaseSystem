@@ -6,6 +6,12 @@ import { Topic } from "../entities/topics";
 import { getAllRootTopics, getById, insert, logicalDeletion, update, updateSingleProperty } from "../repositories/topics";
 import { getNumberOfPreviousVersions, storeVersion } from "../repositories/topicsVersions";
 import { contentSchema, nameSchema } from "../schemas/topics";
+import { attachResourcesToTopics } from "./resources";
+import { buildResourcesFromMixed } from "../factories/resources";
+import { WarningExposedResponse } from "../types";
+import { AResource } from "../entities/resources/AResource";
+import { Resources } from "../schemas";
+import { isResourceRequestShape } from "../utils/resources";
 
 export async function retrieveAnTopic(id: number, version?: number | null): Promise<Topic> {
   const topic = await getById(id, version);
@@ -22,11 +28,17 @@ export async function retrieveAllRootTopics(): Promise<Topic[]> {
   return topics ? topics : [];
 }
 
-export async function createTopic(topic: Topic): Promise<Topic> {
+export async function createTopic(topic: Topic, resources: Resources.RequestsShape): Promise<WarningExposedResponse> {
   const id = await insert(topic);
+
   if (!id || isNaN(Number(id))) {
     throw new ExpectedError(HTTPSTATUS.SERVER_ERROR, "Error while creating new topic! Unable to detect the created topic!");
   }
+
+  const microTask1Response = await buildResourcesFromMixed(resources);
+  const microTask2Response = await attachResourcesToTopics(microTask1Response.response as AResource<Resources.Types>[], id);
+
+  const microTasksWarnings = [...microTask1Response.warnings, ...microTask2Response.warnings];
 
   const result = await getById(Number(id));
 
@@ -34,10 +46,13 @@ export async function createTopic(topic: Topic): Promise<Topic> {
     throw new ExpectedError(HTTPSTATUS.SERVER_ERROR, "Error while creating new topic! Unable to detect the created topic!");
   }
 
-  return result;
+  return {
+    response: result,
+    warnings: microTasksWarnings
+  };
 }
 
-export async function fullUpdateTopic(id: number, topicUpdates: Topic): Promise<Topic> {
+export async function fullUpdateTopic(id: number, topicUpdates: Topic, resources: Resources.RequestsShape): Promise<WarningExposedResponse> {
 
   const currentTopic = await getById(id);
 
@@ -57,16 +72,24 @@ export async function fullUpdateTopic(id: number, topicUpdates: Topic): Promise<
     throw new ExpectedError(HTTPSTATUS.SERVER_ERROR, "Unable to detect if the topic was updated!");
   }
 
+  const microTask1Response = await buildResourcesFromMixed(resources);
+  const microTask2Response = await attachResourcesToTopics(microTask1Response.response as AResource<Resources.Types>[], id);
+
+  const microTasksWarnings = [...microTask1Response.warnings, ...microTask2Response.warnings];
+
   const updated = await getById(id);
 
   if (!updated) {
     throw new ExpectedError(HTTPSTATUS.SERVER_ERROR, "Unable to retrieve the updated topic!");
   }
 
-  return updated;
+  return {
+    response: updated,
+    warnings: microTasksWarnings
+  }
 }
 
-export async function partialUpdateTopic(id: number, patch: PatchShape): Promise<Topic> {
+export async function partialUpdateTopic(id: number, patch: PatchShape): Promise<WarningExposedResponse> {
 
   const currentTopic = await getById(id);
 
@@ -80,7 +103,7 @@ export async function partialUpdateTopic(id: number, patch: PatchShape): Promise
   const targetProp = String(patch.path);
   const targetPropNewValue = patch.value;
 
-  const validProps = ['name', 'content', 'parentTopicId'];
+  const validProps = ['name', 'content', 'parentTopicId', 'resources'];
 
   if (!validProps.includes(targetProp)) {
     throw new ExpectedError(HTTPSTATUS.BAD_REQUEST, `Invalid path: ${patch.path} - You can only patch the paths: ${validProps.join(", ")} of Topics`);
@@ -92,12 +115,23 @@ export async function partialUpdateTopic(id: number, patch: PatchShape): Promise
     name: nameSchema,
     content: contentSchema,
     parentTopicId: idSchema,
+    resources: Resources.requestsSchema
   };
 
   try {
     possibleValidations[targetProp].parse(targetPropNewValue);
   } catch (error) {
     throw new ExpectedError(HTTPSTATUS.BAD_REQUEST, `Invalid value for ${targetProp} '${targetPropNewValue}'`, error);
+  }
+
+  let warnings: string[] = [];
+
+  if (targetProp == 'resources' && isResourceRequestShape(targetPropNewValue)) {
+
+    const microTask1Response = await buildResourcesFromMixed(targetPropNewValue);
+    const microTask2Response = await attachResourcesToTopics(microTask1Response.response as AResource<Resources.Types>[], id);
+
+    warnings = [...microTask1Response.warnings, ...microTask2Response.warnings];
   }
 
   const result = await updateSingleProperty(id, targetProp, targetPropNewValue, currentVersion);
@@ -112,7 +146,10 @@ export async function partialUpdateTopic(id: number, patch: PatchShape): Promise
     throw new ExpectedError(HTTPSTATUS.SERVER_ERROR, "Unable to retrieve the updated topic!");
   }
 
-  return updated;
+  return {
+    response: updated,
+    warnings: warnings
+  };
 }
 
 export async function deleteTopic(id: number): Promise<boolean> {

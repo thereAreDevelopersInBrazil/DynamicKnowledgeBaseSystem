@@ -1,5 +1,5 @@
 import { dbClient } from '../database/client';
-import { resources } from '../database/schema';
+import { resources, resources_topics } from '../database/schema';
 import { and, eq, ne } from 'drizzle-orm';
 import { ExpectedError } from '../errors';
 import { HTTPSTATUS } from '../constants/http';
@@ -37,7 +37,7 @@ export async function getAll(): Promise<AResource<Resources.Types>[]> {
         return [];
     }
 
-    const entities: AResource<'Article' | 'Pdf' | 'Video'>[] = result.map((result: Resources.Shape<Resources.Types>) => {
+    const entities: AResource<Resources.Types>[] = result.map((result: Resources.Shape<Resources.Types>) => {
         return buildResource(result)
     });
 
@@ -78,7 +78,33 @@ export async function getByUrl(url: string, exclude: number | null = null): Prom
 
     return buildResource(result);
 }
+export async function getResourcesByTopicId(id: number) {
+    const result = await dbClient.select({
+        id: resources.id,
+        url: resources.url,
+        description: resources.description,
+        type: resources.type,
+        details: resources.details
+    })
+        .from(resources)
+        .innerJoin(resources_topics, eq(resources.id, resources_topics.resourceId))
+        .where(
+            and(
+                eq(resources_topics.topicId, id),
+                eq(resources.isDeleted, false)
+            )
+        );
 
+    if (!result) {
+        return [];
+    }
+
+    const entities: AResource<Resources.Types>[] = result.map((result: Resources.Shape<Resources.Types>) => {
+        return buildResource(result)
+    });
+
+    return entities;
+}
 export async function update(id: number, entity: AResource<Resources.Types>): Promise<boolean> {
     const result = await dbClient
         .update(resources)

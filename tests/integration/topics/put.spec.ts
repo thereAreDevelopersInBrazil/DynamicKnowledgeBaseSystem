@@ -52,7 +52,7 @@ describe('Test PUT /topics route', () => {
     });
 
     it('should be an 200 if everything goes well', async () => {
-        (fullUpdateTopic as jest.Mock).mockResolvedValue(VALID_TOPIC);
+        (fullUpdateTopic as jest.Mock).mockResolvedValue({response:VALID_TOPIC, warnings: []});
 
         const response = await request(server)
             .put('/topics/999')

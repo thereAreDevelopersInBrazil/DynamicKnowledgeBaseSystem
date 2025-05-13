@@ -16,12 +16,12 @@ router.get('/path', authenticator(), roleChecker("view_topics"), validator({ que
 router.get('/:id', authenticator(), roleChecker("view_topics"), validator({ query: Topics.getSchema }), Get);
 
 
-router.post('/', authenticator(), roleChecker("create_topics"), validator({ body: Topics.base }), Post);
+router.post('/', authenticator(), roleChecker("create_topics"), validator({ body: Topics.requestSchema }), Post);
 
 // I've decided that for PUT , API's users will have to send all base Topic fields
 // if they wanna update a single property the right http method is PATCH
-router.put('/', authenticator(), roleChecker("edit_topics"), validator({ params: idSchema, body: Topics.base }), Put);
-router.put('/:id', authenticator(), roleChecker("edit_topics"), validator({ params: idSchema, body: Topics.base }), Put);
+router.put('/', authenticator(), roleChecker("edit_topics"), validator({ params: idSchema, body: Topics.requestSchema }), Put);
+router.put('/:id', authenticator(), roleChecker("edit_topics"), validator({ params: idSchema, body: Topics.requestSchema }), Put);
 
 // In this method they can update the resource partially, but must follow RFC rfc6902 body format
 router.patch('/', authenticator(), roleChecker("edit_topics"), validator({ params: idSchema, body: patchSchema }), Patch);

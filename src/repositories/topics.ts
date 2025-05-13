@@ -2,9 +2,9 @@ import { dbClient } from '../database/client';
 import { topics, topics_versions } from '../database/schema';
 import { Topic } from '../entities/topics';
 import { and, eq, isNull, ne } from 'drizzle-orm';
-import { Topics } from '../schemas';
 import { buildChildren } from '../factories/topics';
 import { PatchPossibleValues } from '../schemas/abstracts';
+import { getResourcesByTopicId } from './resources';
 
 export async function insert(topic: Topic): Promise<number> {
     const result = await dbClient.insert(topics).values({
@@ -30,8 +30,10 @@ export async function getAllRootTopics(): Promise<Topic[]> {
         return [];
     }
 
-    const entities: Topic[] = await Promise.all(result.map(async (result: Topics.Shape) => {
-        const topic = new Topic(result);
+    const entities: Topic[] = await Promise.all(result.map(async (raw) => {
+        const topic = new Topic({ ...raw, resources: [] });
+        const resources = await getResourcesByTopicId(topic.getId());
+        topic.setResources(resources);
         return await buildChildren(topic);
     }));
 
@@ -72,7 +74,10 @@ export async function getById(id: number, version: number | null = null): Promis
         return null;
     }
 
-    return await buildChildren(new Topic(result));
+    const topic = new Topic({ ...result, resources: [] });
+    const resources = await getResourcesByTopicId(result.id);
+    topic.setResources(resources);
+    return await buildChildren(topic);
 }
 
 export async function getChildren(id: number): Promise<Topic[]> {
@@ -84,9 +89,12 @@ export async function getChildren(id: number): Promise<Topic[]> {
                 eq(topics.parentTopicId, id)
             )
         );
-    return children.map((child) => {
-        return new Topic(child)
-    });
+    return await Promise.all(children.map(async (child) => {
+        const topic = new Topic({ ...child, resources: [] });
+        const resources = await getResourcesByTopicId(topic.getId());
+        topic.setResources(resources);
+        return topic;
+    }));
 }
 
 export async function getSiblings(id: number, parentId: number | null): Promise<Topic[]> {
@@ -100,7 +108,7 @@ export async function getSiblings(id: number, parentId: number | null): Promise<
         );
 
     return siblings.map((sibling) => {
-        return new Topic(sibling);
+        return new Topic({ ...sibling, resources: [] });
     });
 }
 

@@ -44,7 +44,7 @@ describe('Test POST /topics route', () => {
     });
 
     it('should be an 200 if everything goes well', async () => {
-        (createTopic as jest.Mock).mockResolvedValue(VALID_TOPIC);
+        (createTopic as jest.Mock).mockResolvedValue({response:VALID_TOPIC, warnings: []});
 
         const response = await request(server)
             .post('/topics')

@@ -10,7 +10,8 @@ export const VALID_TOPIC = new Topic({
     parentTopicId: 16,
     createdAt: "2025-05-04 17:37:45",
     updatedAt: "2025-05-04 17:37:45",
-    children: []
+    children: [],
+    resources: []
 });
 
 
