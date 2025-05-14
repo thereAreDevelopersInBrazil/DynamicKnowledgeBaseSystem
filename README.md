@@ -51,6 +51,12 @@ For this project I used:
 ### New: :fire: Users Management:
 - Created all CRUD methods to users
 - :fire: Created authentication based on email + password
+**IMPORTANT: THE DEFAULT SYSTEM USER TO ACCESS THE ENDPOINTS IS:
+email: system@default.com
+password: @DynamicKnowledge2025@
+Use the /users/login endpoint to get an JWT token that should be used in the Headers as Bearer Token of further requests
+Check out the postman collection I am sharing at the end of this file for further assistence or samples on each endpoint!
+
 - :fire: Created fine grained permission system according to the roles of users
   
 ## Complex Business Logic:
